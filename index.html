@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -40,6 +41,12 @@
     <aside id="sidebar" class="sidebar">
         <nav class="nav">
             <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="overview">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Overview</span>
+                    </a>
+                </li>
                 <li class="nav-item active">
                     <a href="#" class="nav-link" data-section="column-analysis">
                         <i class="fas fa-columns"></i>
@@ -56,12 +63,6 @@
                     <a href="#" class="nav-link" data-section="pump-analysis">
                         <i class="fas fa-cogs"></i>
                         <span>Pump Analysis</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="overview">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Overview</span>
                     </a>
                 </li>
             </ul>
@@ -95,6 +96,181 @@
                 </button>
             </div>
         </div>
+
+        <!-- Overview Section -->
+        <section id="overview" class="analysis-section">
+            <div class="section-header">
+                <h2>Dashboard Overview</h2>
+                <div class="control-buttons">
+                    <button class="btn-primary" id="refreshOverview">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh Data
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Enhanced Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Records</h3>
+                        <p class="stat-number" id="totalRecords">0</p>
+                        <span class="stat-change" id="recordsChange">No data</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Good Process (Cpk ≥ 1.33)</h3>
+                        <p class="stat-number" id="goodProcess">0</p>
+                        <span class="stat-change" id="goodChange">0%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Acceptable (Cpk ≥ 1.0)</h3>
+                        <p class="stat-number" id="acceptableProcess">0</p>
+                        <span class="stat-change" id="acceptableChange">0%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Poor Process (Cpk < 1.0)</h3>
+                        <p class="stat-number" id="poorProcess">0</p>
+                        <span class="stat-change" id="poorChange">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Summary Section -->
+            <div class="summary-section">
+                <div class="summary-card">
+                    <h3><i class="fas fa-chart-line"></i> Process Capability Summary</h3>
+                    <div class="summary-table">
+                        <table class="overview-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Mean Cp</th>
+                                    <th>Mean Cpk</th>
+                                    <th>Status</th>
+                                    <th>Out of Spec %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overviewSummaryTable">
+                                <tr><td colspan="5" class="no-data">No analysis data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3><i class="fas fa-cogs"></i> Pump Performance Overview</h3>
+                    <div class="pump-overview">
+                        <div class="pump-grid" id="pumpOverviewGrid">
+                            <div class="pump-card">
+                                <h4>Pump 1</h4>
+                                <div class="pump-stats">
+                                    <span id="pump1-count">0 samples</span>
+                                    <span id="pump1-avg" class="pump-cpk">Avg Cpk: 0.00</span>
+                                </div>
+                            </div>
+                            <div class="pump-card">
+                                <h4>Pump 2</h4>
+                                <div class="pump-stats">
+                                    <span id="pump2-count">0 samples</span>
+                                    <span id="pump2-avg" class="pump-cpk">Avg Cpk: 0.00</span>
+                                </div>
+                            </div>
+                            <div class="pump-card">
+                                <h4>Pump 3</h4>
+                                <div class="pump-stats">
+                                    <span id="pump3-count">0 samples</span>
+                                    <span id="pump3-avg" class="pump-cpk">Avg Cpk: 0.00</span>
+                                </div>
+                            </div>
+                            <div class="pump-card">
+                                <h4>Pump 4</h4>
+                                <div class="pump-stats">
+                                    <span id="pump4-count">0 samples</span>
+                                    <span id="pump4-avg" class="pump-cpk">Avg Cpk: 0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overview Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Overall Process Capability Distribution</h4>
+                    </div>
+                    <canvas id="overviewCapabilityChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Data Distribution by Parameter</h4>
+                    </div>
+                    <canvas id="overviewDistributionChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Pump Performance Comparison</h4>
+                    </div>
+                    <canvas id="overviewPumpChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Process Stability Trend</h4>
+                    </div>
+                    <canvas id="overviewTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="quick-info">
+                <div class="info-card">
+                    <h3>How to Use This Dashboard</h3>
+                    <ul>
+                        <li><strong>Step 1:</strong> Upload your CSV file or use sample data</li>
+                        <li><strong>Step 2:</strong> Navigate to Column Analysis for overall Cp/Cpk</li>
+                        <li><strong>Step 3:</strong> Use Batch Analysis to analyze data in groups</li>
+                        <li><strong>Step 4:</strong> Use Pump Analysis for pump-specific analysis</li>
+                        <li><strong>Step 5:</strong> Download reports for documentation</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Process Capability Guidelines</h3>
+                    <ul>
+                        <li><strong>Cp/Cpk ≥ 1.33:</strong> Excellent process capability</li>
+                        <li><strong>Cp/Cpk ≥ 1.0:</strong> Acceptable process capability</li>
+                        <li><strong>Cp/Cpk < 1.0:</strong> Poor process capability - requires improvement</li>
+                        <li><strong>Cp:</strong> Measures process spread vs specification width</li>
+                        <li><strong>Cpk:</strong> Measures process centering and spread</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
         <!-- Column Analysis Section -->
         <section id="column-analysis" class="analysis-section active">
@@ -141,8 +317,9 @@
                 <div class="chart-card">
                     <div class="chart-header">
                         <h4>EL Before Weight Distribution</h4>
-                        <select class="chart-type-selector" data-chart="chart1">
+                        <select class="chart-type-selector" data-chart="chart1" data-column="EL Before Weight">
                             <option value="histogram">Histogram</option>
+                            <option value="scatter">Scatter Plot</option>
                             <option value="pie">Pie Chart</option>
                             <option value="line">Line Chart</option>
                         </select>
@@ -153,8 +330,9 @@
                 <div class="chart-card">
                     <div class="chart-header">
                         <h4>EL After Weight Distribution</h4>
-                        <select class="chart-type-selector" data-chart="chart2">
+                        <select class="chart-type-selector" data-chart="chart2" data-column="EL After Weight">
                             <option value="histogram">Histogram</option>
+                            <option value="scatter">Scatter Plot</option>
                             <option value="pie">Pie Chart</option>
                             <option value="line">Line Chart</option>
                         </select>
@@ -165,8 +343,9 @@
                 <div class="chart-card">
                     <div class="chart-header">
                         <h4>EL Weight Distribution</h4>
-                        <select class="chart-type-selector" data-chart="chart3">
+                        <select class="chart-type-selector" data-chart="chart3" data-column="EL Weight">
                             <option value="histogram">Histogram</option>
+                            <option value="scatter">Scatter Plot</option>
                             <option value="pie">Pie Chart</option>
                             <option value="line">Line Chart</option>
                         </select>
@@ -331,81 +510,6 @@
                         <h4>Overall Pump Performance</h4>
                     </div>
                     <canvas id="pumpOverallChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <!-- Overview Section -->
-        <section id="overview" class="analysis-section">
-            <div class="section-header">
-                <h2>Dashboard Overview</h2>
-            </div>
-            
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Total Records</h3>
-                        <p class="stat-number" id="totalRecords">0</p>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Good Process</h3>
-                        <p class="stat-number" id="goodProcess">0</p>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon orange">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Needs Attention</h3>
-                        <p class="stat-number" id="needsAttention">0</p>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon red">
-                        <i class="fas fa-times-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Poor Process</h3>
-                        <p class="stat-number" id="poorProcess">0</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Info -->
-            <div class="quick-info">
-                <div class="info-card">
-                    <h3>How to Use This Dashboard</h3>
-                    <ul>
-                        <li><strong>Step 1:</strong> Upload your CSV file or use sample data</li>
-                        <li><strong>Step 2:</strong> Navigate to Column Analysis for overall Cp/Cpk</li>
-                        <li><strong>Step 3:</strong> Use Batch Analysis to analyze data in groups</li>
-                        <li><strong>Step 4:</strong> Use Pump Analysis for pump-specific analysis</li>
-                        <li><strong>Step 5:</strong> Download reports for documentation</li>
-                    </ul>
-                </div>
-                
-                <div class="info-card">
-                    <h3>Process Capability Guidelines</h3>
-                    <ul>
-                        <li><strong>Cp/Cpk ≥ 1.33:</strong> Excellent process capability</li>
-                        <li><strong>Cp/Cpk ≥ 1.0:</strong> Acceptable process capability</li>
-                        <li><strong>Cp/Cpk < 1.0:</strong> Poor process capability - requires improvement</li>
-                        <li><strong>Cp:</strong> Measures process spread</li>
-                        <li><strong>Cpk:</strong> Measures process centering</li>
-                    </ul>
                 </div>
             </div>
         </section>
