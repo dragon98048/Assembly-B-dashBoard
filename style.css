@@ -417,14 +417,14 @@ body {
     border: 1px solid var(--border-color);
 }
 
-.results-table {
+.results-table, .overview-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
     background: white;
 }
 
-.results-table th {
+.results-table th, .overview-table th {
     background: var(--background-color);
     padding: 1rem 0.75rem;
     text-align: left;
@@ -433,12 +433,12 @@ body {
     color: var(--text-primary);
 }
 
-.results-table td {
+.results-table td, .overview-table td {
     padding: 0.75rem;
     border-bottom: 1px solid var(--border-color);
 }
 
-.results-table tr:hover {
+.results-table tr:hover, .overview-table tr:hover {
     background: var(--background-color);
 }
 
@@ -483,7 +483,7 @@ body {
 /* Charts Grid */
 .charts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
     gap: 2rem;
     margin-bottom: 2rem;
 }
@@ -495,17 +495,28 @@ body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     position: relative;
     transition: transform 0.3s ease;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
 }
 
 .chart-card:hover {
     transform: translateY(-2px);
 }
 
+.chart-card canvas {
+    max-height: 400px !important;
+    height: 400px !important;
+    flex: 1;
+    min-height: 300px;
+}
+
 .chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
 }
 
 .chart-header h4 {
@@ -577,6 +588,96 @@ body {
     color: var(--text-primary);
 }
 
+.stat-change {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.stat-change.positive {
+    color: var(--success-color);
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+.stat-change.negative {
+    color: var(--danger-color);
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.stat-change.neutral {
+    color: var(--text-secondary);
+    background-color: rgba(107, 114, 128, 0.1);
+}
+
+/* Summary Section */
+.summary-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: var(--card-background);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card h3 {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.summary-table {
+    overflow-x: auto;
+}
+
+.pump-overview {
+    width: 100%;
+}
+
+.pump-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.pump-card {
+    background: var(--background-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.pump-card h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.pump-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.pump-stats span {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.pump-cpk {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
 /* Quick Info */
 .quick-info {
     display: grid;
@@ -643,6 +744,10 @@ body {
         width: 100%;
         justify-content: flex-start;
     }
+    
+    .summary-section {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 768px) {
@@ -681,6 +786,21 @@ body {
     .batch-selector select {
         width: 100%;
     }
+    
+    .chart-card {
+        height: 400px;
+        padding: 1rem;
+    }
+    
+    .chart-card canvas {
+        max-height: 300px !important;
+        height: 300px !important;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -706,16 +826,20 @@ body {
         padding: 1rem;
     }
     
-    .results-table {
+    .results-table, .overview-table {
         font-size: 0.8rem;
     }
     
-    .results-table th,
-    .results-table td {
+    .results-table th, .overview-table th,
+    .results-table td, .overview-table td {
         padding: 0.5rem 0.25rem;
     }
     
     .quick-info {
         grid-template-columns: 1fr;
+    }
+    
+    .pump-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
