@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quality Control Dashboard - Cp/Cpk Analysis</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button id="menu-toggle" class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="logo">Quality Control Dashboard</h1>
+        </div>
+        <div class="header-right">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <button class="upload-btn" id="uploadDataBtn">
+                <i class="fas fa-upload"></i>
+                Upload CSV Data
+            </button>
+            <div class="user-profile">
+                <i class="fas fa-bell notification-icon"></i>
+                <div class="profile-img">
+                    <img src="https://via.placeholder.com/40" alt="Profile">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+        <nav class="nav">
+            <ul class="nav-list">
+                <li class="nav-item active">
+                    <a href="#" class="nav-link" data-section="column-analysis">
+                        <i class="fas fa-columns"></i>
+                        <span>Column Analysis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="batch-analysis">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Batch Analysis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="pump-analysis">
+                        <i class="fas fa-cogs"></i>
+                        <span>Pump Analysis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="overview">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Overview</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- File Upload Section -->
+        <div class="upload-section" id="uploadSection">
+            <div class="upload-container">
+                <h3>
+                    <i class="fas fa-upload"></i>
+                    Upload Your Data
+                </h3>
+                <div class="file-upload-area">
+                    <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                    <button class="btn-primary" onclick="document.getElementById('csvFileInput').click()">
+                        <i class="fas fa-file-csv"></i>
+                        Choose CSV File
+                    </button>
+                    <span id="fileName" class="file-name"></span>
+                </div>
+                <div class="upload-info">
+                    <p><strong>Required columns:</strong> EL Before Weight, EL After Weight, EL Weight, EL Filling Pump Number</p>
+                    <p><strong>Specifications:</strong> Before Weight (302-322), After Weight (338.7-346.5), Weight (36.7-37.5)</p>
+                </div>
+                <button class="btn-secondary" id="useSampleData">
+                    <i class="fas fa-database"></i>
+                    Use Sample Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Column Analysis Section -->
+        <section id="column-analysis" class="analysis-section active">
+            <div class="section-header">
+                <h2>Column-wise Cp/Cpk Analysis</h2>
+                <div class="control-buttons">
+                    <button class="btn-primary" id="calculateColumnCpk">
+                        <i class="fas fa-calculator"></i>
+                        Calculate Cp/Cpk
+                    </button>
+                    <button class="btn-download" id="downloadColumnReport">
+                        <i class="fas fa-download"></i>
+                        Download Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="results-container">
+                <h3>Cp/Cpk Results Summary</h3>
+                <div class="table-wrapper">
+                    <table id="columnResultsTable" class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Column</th>
+                                <th>LSL</th>
+                                <th>USL</th>
+                                <th>Mean</th>
+                                <th>Std Dev</th>
+                                <th>Cp</th>
+                                <th>Cpk</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="8" class="no-data">No data available. Please upload a CSV file or use sample data.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>EL Before Weight Distribution</h4>
+                        <select class="chart-type-selector" data-chart="chart1">
+                            <option value="histogram">Histogram</option>
+                            <option value="pie">Pie Chart</option>
+                            <option value="line">Line Chart</option>
+                        </select>
+                    </div>
+                    <canvas id="chart1"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>EL After Weight Distribution</h4>
+                        <select class="chart-type-selector" data-chart="chart2">
+                            <option value="histogram">Histogram</option>
+                            <option value="pie">Pie Chart</option>
+                            <option value="line">Line Chart</option>
+                        </select>
+                    </div>
+                    <canvas id="chart2"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>EL Weight Distribution</h4>
+                        <select class="chart-type-selector" data-chart="chart3">
+                            <option value="histogram">Histogram</option>
+                            <option value="pie">Pie Chart</option>
+                            <option value="line">Line Chart</option>
+                        </select>
+                    </div>
+                    <canvas id="chart3"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Cp/Cpk Comparison</h4>
+                    </div>
+                    <canvas id="chart4"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Batch Analysis Section -->
+        <section id="batch-analysis" class="analysis-section">
+            <div class="section-header">
+                <h2>Batch-wise Cp/Cpk Analysis</h2>
+                <div class="control-buttons">
+                    <div class="batch-controls">
+                        <label>Batch Size:</label>
+                        <input type="number" id="batchSize" value="100" min="10" max="1000">
+                        <button class="btn-primary" id="calculateBatchCpk">
+                            <i class="fas fa-calculator"></i>
+                            Calculate Batches
+                        </button>
+                    </div>
+                    <button class="btn-download" id="downloadBatchReport">
+                        <i class="fas fa-download"></i>
+                        Download Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Batch Selector -->
+            <div class="batch-selector">
+                <label>Select Batch for Detailed View:</label>
+                <select id="batchSelect">
+                    <option value="">Calculate batches first...</option>
+                </select>
+            </div>
+
+            <!-- Batch Results -->
+            <div class="results-container">
+                <h3>Batch Analysis Results</h3>
+                <div class="table-wrapper">
+                    <table id="batchResultsTable" class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Batch</th>
+                                <th>Column</th>
+                                <th>Count</th>
+                                <th>Mean</th>
+                                <th>Std Dev</th>
+                                <th>Cp</th>
+                                <th>Cpk</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="8" class="no-data">No batch data available. Calculate batches first.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Batch Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Batch Cp/Cpk Trends</h4>
+                    </div>
+                    <canvas id="batchTrendChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Selected Batch Distribution</h4>
+                    </div>
+                    <canvas id="selectedBatchChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pump Analysis Section -->
+        <section id="pump-analysis" class="analysis-section">
+            <div class="section-header">
+                <h2>Pump-wise Cp/Cpk Analysis</h2>
+                <div class="control-buttons">
+                    <div class="pump-controls">
+                        <label>Select Pump:</label>
+                        <select id="pumpSelect">
+                            <option value="">All Pumps</option>
+                            <option value="1">Pump 1</option>
+                            <option value="2">Pump 2</option>
+                            <option value="3">Pump 3</option>
+                            <option value="4">Pump 4</option>
+                        </select>
+                        <button class="btn-primary" id="calculatePumpCpk">
+                            <i class="fas fa-calculator"></i>
+                            Calculate Pump Cp/Cpk
+                        </button>
+                    </div>
+                    <button class="btn-download" id="downloadPumpReport">
+                        <i class="fas fa-download"></i>
+                        Download Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pump Results -->
+            <div class="results-container">
+                <h3>Pump Analysis Results</h3>
+                <div class="table-wrapper">
+                    <table id="pumpResultsTable" class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Pump</th>
+                                <th>Column</th>
+                                <th>Count</th>
+                                <th>Mean</th>
+                                <th>Std Dev</th>
+                                <th>Cp</th>
+                                <th>Cpk</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="8" class="no-data">No pump data available. Calculate pump analysis first.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pump Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Pump Cp/Cpk Comparison</h4>
+                    </div>
+                    <canvas id="pumpComparisonChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Selected Pump Distribution</h4>
+                    </div>
+                    <canvas id="selectedPumpChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Pump Performance Summary</h4>
+                    </div>
+                    <canvas id="pumpSummaryChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Overall Pump Performance</h4>
+                    </div>
+                    <canvas id="pumpOverallChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Overview Section -->
+        <section id="overview" class="analysis-section">
+            <div class="section-header">
+                <h2>Dashboard Overview</h2>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Records</h3>
+                        <p class="stat-number" id="totalRecords">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Good Process</h3>
+                        <p class="stat-number" id="goodProcess">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Needs Attention</h3>
+                        <p class="stat-number" id="needsAttention">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Poor Process</h3>
+                        <p class="stat-number" id="poorProcess">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="quick-info">
+                <div class="info-card">
+                    <h3>How to Use This Dashboard</h3>
+                    <ul>
+                        <li><strong>Step 1:</strong> Upload your CSV file or use sample data</li>
+                        <li><strong>Step 2:</strong> Navigate to Column Analysis for overall Cp/Cpk</li>
+                        <li><strong>Step 3:</strong> Use Batch Analysis to analyze data in groups</li>
+                        <li><strong>Step 4:</strong> Use Pump Analysis for pump-specific analysis</li>
+                        <li><strong>Step 5:</strong> Download reports for documentation</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Process Capability Guidelines</h3>
+                    <ul>
+                        <li><strong>Cp/Cpk ≥ 1.33:</strong> Excellent process capability</li>
+                        <li><strong>Cp/Cpk ≥ 1.0:</strong> Acceptable process capability</li>
+                        <li><strong>Cp/Cpk < 1.0:</strong> Poor process capability - requires improvement</li>
+                        <li><strong>Cp:</strong> Measures process spread</li>
+                        <li><strong>Cpk:</strong> Measures process centering</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
